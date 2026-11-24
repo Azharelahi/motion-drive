@@ -109,6 +109,15 @@ function resolveStoredPath(storedName: string): string {
   return filePath;
 }
 
+export function getStoredFileMimeType(storedName: string): string {
+  resolveStoredPath(storedName);
+  const mimeType = MIME_BY_EXTENSION[path.extname(storedName).toLowerCase()];
+  if (!mimeType) {
+    throw new StorageValidationError("Invalid stored file type.");
+  }
+  return mimeType;
+}
+
 /** Validates and stores an upload under a generated, traversal-safe name. */
 export async function saveUpload(input: SaveUploadInput): Promise<StoredUpload> {
   const originalName = safeOriginalName(input.originalName);

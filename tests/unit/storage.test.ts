@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   deleteStoredFile,
+  getStoredFileMimeType,
   listStoredFiles,
   MAX_UPLOAD_BYTES,
   readStoredFile,
@@ -20,6 +21,7 @@ describe("local upload storage", () => {
     try {
       expect(upload.originalName).toBe("sample.txt");
       expect(upload.mimeType).toBe("text/plain");
+      expect(getStoredFileMimeType(upload.storedName)).toBe("text/plain");
       expect(upload.sizeBytes).toBe(data.byteLength);
       expect(upload.storagePath).toMatch(/^storage\/uploads\//);
       expect(upload.storedName).toMatch(/^[0-9a-f-]+\.txt$/i);
@@ -65,5 +67,6 @@ describe("local upload storage", () => {
   it("rejects paths supplied instead of a generated stored name", async () => {
     await expect(readStoredFile("../outside.txt")).rejects.toBeInstanceOf(StorageValidationError);
     await expect(deleteStoredFile("../outside.txt")).rejects.toBeInstanceOf(StorageValidationError);
+    expect(() => getStoredFileMimeType("../outside.txt")).toThrow(StorageValidationError);
   });
 });
