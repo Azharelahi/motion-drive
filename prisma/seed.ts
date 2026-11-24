@@ -7,6 +7,7 @@ import {
 } from "../src/lib/storage";
 import { isMoziDriverName, seedData, signedAgreementPdfs } from "../src/lib/seed-data";
 import { prisma } from "../src/lib/db";
+import { syncSeedDatabase } from "../src/lib/sync";
 
 function dateOnly(value: string | null): Date | null {
   return value ? new Date(`${value}T00:00:00.000Z`) : null;
@@ -219,6 +220,8 @@ async function main(): Promise<void> {
     throw error;
   }
 
+  const syncResult = await syncSeedDatabase();
+
   const [vehicleCount, driverCount, contractCount, documentCount, moziCount] = await Promise.all([
     prisma.vehicle.count(),
     prisma.driver.count(),
@@ -233,6 +236,7 @@ async function main(): Promise<void> {
     seededContracts: contracts.length,
     seededDocumentLinks: documents.length,
     embeddedAgreementPdfs: signedFiles.size,
+    sync: syncResult,
     databaseCounts: { vehicles: vehicleCount, drivers: driverCount, contracts: contractCount, documents: documentCount },
     moziDriverCount: moziCount,
   });
