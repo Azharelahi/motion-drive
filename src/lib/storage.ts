@@ -1,5 +1,15 @@
 import { randomUUID } from "node:crypto";
-import { access, lstat, mkdir, open, readFile as readFileFromDisk, readdir, unlink } from "node:fs/promises";
+import {
+  access,
+  lstat,
+  mkdir,
+  open,
+  readFile as readFileFromDisk,
+  readdir,
+  rename,
+  rm,
+  unlink,
+} from "node:fs/promises";
 import { constants } from "node:fs";
 import path from "node:path";
 
@@ -56,6 +66,17 @@ export interface StoredFileInfo {
   storedName: string;
   sizeBytes: number;
   modifiedAt: Date;
+}
+
+export interface StoredFileRestoreInput {
+  storedName: string;
+  data: Uint8Array;
+}
+
+export interface StagedStoredFileRestore {
+  activate(): Promise<void>;
+  rollback(): Promise<void>;
+  finalize(): Promise<void>;
 }
 
 function safeOriginalName(originalName: string): string {
@@ -116,6 +137,89 @@ export function getStoredFileMimeType(storedName: string): string {
     throw new StorageValidationError("Invalid stored file type.");
   }
   return mimeType;
+}
+
+export async function stageStoredFileRestore(
+  files: StoredFileRestoreInput[],
+): Promise<StagedStoredFileRestore> {
+  const storageDirectory = path.dirname(UPLOAD_DIRECTORY);
+  const stagingDirectory = path.join(storageDirectory, `.uploads-stage-${randomUUID()}`);
+  const previousDirectory = path.join(storageDirectory, `.uploads-previous-${randomUUID()}`);
+
+  await ensureUploadDirectory();
+  await mkdir(stagingDirectory, { mode: 0o700 });
+  try {
+    for (const file of files) {
+      getStoredFileMimeType(file.storedName);
+      if (file.data.byteLength > MAX_UPLOAD_BYTES) {
+        throw new StorageValidationError("Files must be 25 MB or smaller.");
+      }
+
+      const targetPath = path.join(stagingDirectory, path.basename(resolveStoredPath(file.storedName)));
+      const handle = await open(targetPath, "wx", 0o600);
+      try {
+        await handle.writeFile(file.data);
+      } finally {
+        await handle.close();
+      }
+    }
+  } catch (error) {
+    await rm(stagingDirectory, { recursive: true, force: true });
+    throw error;
+  }
+
+  let state: "staged" | "previous-moved" | "active" | "finalized" = "staged";
+
+  return {
+    async activate() {
+      if (state !== "staged") throw new Error("Stored files are not in a staged state.");
+
+      await rename(UPLOAD_DIRECTORY, previousDirectory);
+      try {
+        await rename(stagingDirectory, UPLOAD_DIRECTORY);
+        state = "active";
+      } catch (error) {
+        state = "previous-moved";
+        try {
+          await rename(previousDirectory, UPLOAD_DIRECTORY);
+          state = "staged";
+        } catch (rollbackError) {
+          throw new AggregateError(
+            [error, rollbackError],
+            "Could not activate restored files or recover the prior upload directory.",
+          );
+        }
+        throw error;
+      }
+    },
+    async rollback() {
+      if (state === "previous-moved") {
+        await rename(previousDirectory, UPLOAD_DIRECTORY);
+        state = "staged";
+      }
+
+      if (state === "active") {
+        await rename(UPLOAD_DIRECTORY, stagingDirectory);
+        try {
+          await rename(previousDirectory, UPLOAD_DIRECTORY);
+        } catch (error) {
+          await rename(stagingDirectory, UPLOAD_DIRECTORY);
+          throw error;
+        }
+        state = "staged";
+      }
+
+      if (state === "staged") {
+        await rm(stagingDirectory, { recursive: true, force: true });
+        state = "finalized";
+      }
+    },
+    async finalize() {
+      if (state !== "active") throw new Error("Stored files are not active.");
+      await rm(previousDirectory, { recursive: true, force: true });
+      state = "finalized";
+    },
+  };
 }
 
 /** Validates and stores an upload under a generated, traversal-safe name. */

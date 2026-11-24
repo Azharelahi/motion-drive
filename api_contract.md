@@ -12,10 +12,10 @@ and document contents.
 | --- | --- | --- |
 | `GET` | `/api/health` | Check database and local upload-storage readiness. |
 | `GET` | `/api/backup/export` | Download a JSON backup of database records and stored files. |
+| `POST` | `/api/backup/import` | Validate and restore a backup, then redirect to the Dashboard. |
 
-`POST /api/backup/import` is planned in the production blueprint but is not implemented
-yet. The only current page route is `GET /` (the application home page); it is not an
-API endpoint.
+The only current page route is `GET /` (the application home page and backup-restore
+form); it is not an API endpoint.
 
 ## `GET /api/health`
 
@@ -138,8 +138,51 @@ file fails. The endpoint does not return a partial backup.
 
 Headers include `Content-Type: application/json` and `Cache-Control: no-store`.
 
-## Not yet implemented
+## `POST /api/backup/import`
 
-The production blueprint calls for `POST /api/backup/import`, including strict backup
-validation and restore behavior. Until that route is implemented, clients must not
-assume that exported backups can be uploaded through the API.
+Validates and restores a version 1 Motion Drive backup. A valid import replaces all
+database records and stored uploads with the contents of the backup. The request is
+validated completely before any current data is modified. Database changes use a
+transaction; files are staged separately and restored if the transaction fails.
+
+The application home page provides the file picker and a confirmation prompt. The API
+itself does not ask for confirmation, so direct API clients must obtain user
+authorization before submitting a restore.
+
+### Request
+
+- `Content-Type: application/json` (optional UTF-8 charset parameter accepted).
+- Body: the JSON object returned by `GET /api/backup/export`, unchanged.
+- Maximum request body: 256 MiB.
+- No query parameters.
+
+The backup must have `format: "MotionDrive_Backup"` and `version: 1`. It must contain
+the complete `records` object and `files` array described above. Unknown fields,
+duplicate record IDs or unique keys, invalid dates or decimal values, missing
+relationships, missing document files, inconsistent document metadata, unsafe file
+names, non-canonical Base64, and size or MIME mismatches are rejected.
+
+### Success response
+
+`303 See Other` with `Location: /` after all records and files have been restored. The
+dashboard/home page is the redirect destination. The import form follows the redirect
+and navigates the browser to the destination.
+
+### Failure responses
+
+All error responses are JSON and include `Cache-Control: no-store`.
+
+| Status | Meaning |
+| --- | --- |
+| `400 Bad Request` | Missing/invalid JSON or backup fails strict schema/content validation. |
+| `409 Conflict` | Another backup restore is already in progress in this server process. |
+| `413 Content Too Large` | Request body exceeds 256 MiB. |
+| `415 Unsupported Media Type` | Request `Content-Type` is not `application/json`. |
+| `500 Internal Server Error` | Database or filesystem restore failed. |
+
+Validation errors return `{ "error": "Backup validation failed.", "details": "..." }`.
+Other request errors return `{ "error": "..." }`. Internal database/filesystem details
+are logged server-side and are not returned to clients.
+
+If validation fails, the current database and upload files are not changed. The import
+form displays the error and requires the user to select and submit a backup again.
