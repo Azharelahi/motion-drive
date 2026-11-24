@@ -12,6 +12,7 @@ model Vehicle {
   registration       String         @unique @db.VarChar(16)
   make               String?        @db.VarChar(80)
   model              String         @db.VarChar(120)
+  fuelType           String?        @db.VarChar(40)
   year               Int?
   colour             String?        @db.VarChar(60)
   vin                String?        @db.VarChar(32)
@@ -47,6 +48,9 @@ model Driver {
   address                    String?
   licenceNumber              String?        @db.VarChar(80)
   licenceState               String?        @db.VarChar(40)
+  abn                        String?        @db.VarChar(30)
+  emergencyContact           String?
+  rideshareAccreditation     String?        @db.VarChar(120)
   licenceExpiry              DateTime?      @db.Date
   rideshareAccreditationExpiry DateTime?     @db.Date
   status                     String         @default("Ended") @db.VarChar(40)
@@ -69,6 +73,7 @@ model Contract {
   vehicleId         String
   driverId          String
   status            String    @default("Active") @db.VarChar(40)
+  agreementDate     DateTime? @db.Date
   startDate         DateTime  @db.Date
   endDate           DateTime? @db.Date
   initialEndDate    DateTime? @db.Date
@@ -125,7 +130,7 @@ model Document {
   entityType   DocumentEntityType
   documentType String             @db.VarChar(100)
   originalName String             @db.VarChar(255)
-  storedName   String             @unique @db.VarChar(255)
+  storedName   String             @db.VarChar(255)
   storagePath  String             @db.VarChar(500)
   mimeType     String             @db.VarChar(120)
   sizeBytes    BigInt

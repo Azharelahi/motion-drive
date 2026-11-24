@@ -23,6 +23,9 @@ pnpm-debug.log*
 .env*
 !.env.example
 
+# runtime uploads contain user and agreement documents
+/storage/uploads/
+
 # hosting
 .vercel
 
