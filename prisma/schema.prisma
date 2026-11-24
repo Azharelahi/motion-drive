@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Vehicle {
+  id                 String         @id @default(cuid())
+  registration       String         @unique @db.VarChar(16)
+  make               String?        @db.VarChar(80)
+  model              String         @db.VarChar(120)
+  year               Int?
+  colour             String?        @db.VarChar(60)
+  vin                String?        @db.VarChar(32)
+  status             String         @default("Available") @db.VarChar(40)
+  weeklyRent         Decimal        @default(0) @db.Decimal(10, 2)
+  bond               Decimal        @default(500) @db.Decimal(10, 2)
+  excess             Decimal        @default(0) @db.Decimal(10, 2)
+  kmAllowance        String         @default("Unlimited") @db.VarChar(40)
+  pickupLocation     String         @default("Tarneit, VIC") @db.VarChar(160)
+  odometer           Int?
+  nextServiceKm      Int?
+  registrationExpiry DateTime?      @db.Date
+  insuranceExpiry    DateTime?      @db.Date
+  inspectionExpiry   DateTime?      @db.Date
+  notes              String?
+  createdAt          DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime       @updatedAt @db.Timestamptz(3)
+
+  contracts Contract[]
+  swapsAsVehicleOne VehicleSwap[] @relation("SwapVehicleOne")
+  swapsAsVehicleTwo VehicleSwap[] @relation("SwapVehicleTwo")
+  documents Document[]
+
+  @@index([status])
+}
+
+model Driver {
+  id                         String         @id @default(cuid())
+  name                       String         @db.VarChar(160)
+  mobile                     String         @db.VarChar(40)
+  email                      String?        @db.VarChar(254)
+  dateOfBirth                DateTime?      @db.Date
+  address                    String?
+  licenceNumber              String?        @db.VarChar(80)
+  licenceState               String?        @db.VarChar(40)
+  licenceExpiry              DateTime?      @db.Date
+  rideshareAccreditationExpiry DateTime?     @db.Date
+  status                     String         @default("Ended") @db.VarChar(40)
+  notes                      String?
+  createdAt                  DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt                  DateTime       @updatedAt @db.Timestamptz(3)
+
+  contracts Contract[]
+  swapsAsDriverOne VehicleSwap[] @relation("SwapDriverOne")
+  swapsAsDriverTwo VehicleSwap[] @relation("SwapDriverTwo")
+  documents Document[]
+
+  @@index([name])
+  @@index([mobile])
+}
+
+model Contract {
+  id                String    @id @default(cuid())
+  contractNumber    String    @unique @db.VarChar(40)
+  vehicleId         String
+  driverId          String
+  status            String    @default("Active") @db.VarChar(40)
+  startDate         DateTime  @db.Date
+  endDate           DateTime? @db.Date
+  initialEndDate    DateTime? @db.Date
+  weeklyRent        Decimal   @db.Decimal(10, 2)
+  bond              Decimal   @default(500) @db.Decimal(10, 2)
+  excess            Decimal   @default(0) @db.Decimal(10, 2)
+  kmAllowance       String    @default("Unlimited") @db.VarChar(40)
+  term              String    @default("Month to month") @db.VarChar(80)
+  noticePeriod      String    @default("7 days") @db.VarChar(40)
+  paymentFrequency String    @default("Weekly in advance") @db.VarChar(80)
+  paymentMethod     String    @default("Bank Transfer") @db.VarChar(40)
+  rideshareUse      Boolean   @default(true)
+  privateUse        Boolean   @default(true)
+  endedAt           DateTime? @db.Timestamptz(3)
+  createdAt         DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime  @updatedAt @db.Timestamptz(3)
+  swapId            String?
+  swapLeg           String?   @db.VarChar(1)
+
+  vehicle   Vehicle      @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+  driver    Driver       @relation(fields: [driverId], references: [id], onDelete: Restrict)
+  swap      VehicleSwap? @relation(fields: [swapId], references: [id], onDelete: SetNull)
+  documents Document[]
+
+  @@index([vehicleId, status])
+  @@index([driverId, status])
+  @@index([startDate])
+}
+
+model VehicleSwap {
+  id             String   @id @default(cuid())
+  swapNumber     String   @unique @db.VarChar(40)
+  swapDate       DateTime @db.Date
+  driverOneId    String
+  driverTwoId    String
+  vehicleOneId   String
+  vehicleTwoId   String
+  newRentOne     Decimal  @db.Decimal(10, 2)
+  newRentTwo     Decimal  @db.Decimal(10, 2)
+  notes          String?
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+
+  driverOne  Driver     @relation("SwapDriverOne", fields: [driverOneId], references: [id], onDelete: Restrict)
+  driverTwo  Driver     @relation("SwapDriverTwo", fields: [driverTwoId], references: [id], onDelete: Restrict)
+  vehicleOne Vehicle    @relation("SwapVehicleOne", fields: [vehicleOneId], references: [id], onDelete: Restrict)
+  vehicleTwo Vehicle    @relation("SwapVehicleTwo", fields: [vehicleTwoId], references: [id], onDelete: Restrict)
+  contracts  Contract[]
+
+  @@index([swapDate])
+}
+
+model Document {
+  id           String             @id @default(cuid())
+  entityType   DocumentEntityType
+  documentType String             @db.VarChar(100)
+  originalName String             @db.VarChar(255)
+  storedName   String             @unique @db.VarChar(255)
+  storagePath  String             @db.VarChar(500)
+  mimeType     String             @db.VarChar(120)
+  sizeBytes    BigInt
+  expiryDate   DateTime?          @db.Date
+  createdAt    DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime           @updatedAt @db.Timestamptz(3)
+  vehicleId    String?
+  driverId     String?
+  contractId   String?
+
+  vehicle  Vehicle?  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  driver   Driver?   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  contract Contract? @relation(fields: [contractId], references: [id], onDelete: SetNull)
+
+  @@index([vehicleId, expiryDate])
+  @@index([driverId, expiryDate])
+  @@index([contractId])
+}
+
+enum DocumentEntityType {
+  Driver
+  Vehicle
+}

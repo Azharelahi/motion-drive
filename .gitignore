@@ -21,6 +21,7 @@ pnpm-debug.log*
 
 # local env files
 .env*
+!.env.example
 
 # hosting
 .vercel
