@@ -522,6 +522,25 @@ body {
   margin-top: 1.25rem;
 }
 
+.licence-warning {
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.15rem;
+  color: #754800;
+  border: 1px solid #f1d08e;
+  border-radius: 0.65rem;
+  background: #fff8e8;
+}
+
+.licence-warning strong {
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.licence-warning p {
+  margin: 0.25rem 0 0;
+  line-height: 1.45;
+}
+
 .responsive-grid,
 .data-grid,
 .vehicle-grid,
