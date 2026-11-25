@@ -5,6 +5,7 @@ test("mobile shell stacks navigation and uses one-column grids", async ({ page }
   await page.goto("/");
 
   await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible();
 
   const shellColumns = await page.locator(".app-shell").evaluate((element) =>
     getComputedStyle(element).gridTemplateColumns,
@@ -27,6 +28,7 @@ test("mobile shell stacks navigation and uses one-column grids", async ({ page }
 for (const agreementClass of ["rental-contract-view", "swap-agreement-view"]) {
   test(`print layout isolates ${agreementClass}`, async ({ page }) => {
     await page.goto("/");
+    await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible();
     await page.locator(".app-main").evaluate((element, className) => {
       const agreement = document.createElement("article");
       agreement.className = className;
