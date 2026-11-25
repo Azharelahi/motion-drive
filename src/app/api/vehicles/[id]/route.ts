@@ -26,16 +26,40 @@ export async function GET(
       where: { id },
       include: {
         contracts: {
-          include: { driver: true },
+          include: {
+            driver: {
+              select: { id: true, name: true, mobile: true },
+            },
+          },
           orderBy: { startDate: "desc" },
         },
-        documents: { orderBy: { createdAt: "desc" } },
+        documents: {
+          select: {
+            id: true,
+            documentType: true,
+            originalName: true,
+            expiryDate: true,
+            createdAt: true,
+            sizeBytes: true,
+          },
+          orderBy: { createdAt: "desc" },
+        },
       },
     });
     if (!vehicle) {
       return NextResponse.json({ error: "Vehicle not found." }, { status: 404 });
     }
-    return NextResponse.json({ vehicle }, { headers: { "Cache-Control": "no-store" } });
+    const responseVehicle = {
+      ...vehicle,
+      documents: vehicle.documents.map((document) => ({
+        ...document,
+        sizeBytes: document.sizeBytes.toString(),
+      })),
+    };
+    return NextResponse.json(
+      { vehicle: responseVehicle },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   } catch (error) {
     console.error("Vehicle profile load failed", error);
     return NextResponse.json({ error: "Could not load the vehicle." }, { status: 500 });
