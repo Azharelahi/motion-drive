@@ -522,6 +522,58 @@ body {
   margin-top: 1.25rem;
 }
 
+.document-upload {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid #e4e7ec;
+  border-radius: 0.55rem;
+  background: #f8fafc;
+}
+
+.document-upload label {
+  display: grid;
+  gap: 0.35rem;
+  color: #344054;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.document-upload input,
+.document-upload select,
+.document-panel input[type="date"] {
+  min-height: 2.45rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #bfc7d1;
+  border-radius: 0.4rem;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+}
+
+.document-upload__files {
+  grid-column: 1 / -1;
+}
+
+.document-panel__expiry-save {
+  display: block;
+  min-height: 2rem;
+  margin-top: 0.35rem;
+  padding: 0.3rem 0.55rem;
+  font-size: 0.8rem;
+}
+
+.document-panel__error {
+  color: #8a1c23;
+}
+
+.document-panel__success {
+  color: #17623a;
+}
+
 .licence-warning {
   margin-bottom: 1.25rem;
   padding: 1rem 1.15rem;
@@ -614,8 +666,13 @@ body {
   }
 
   .profile-grid,
-  .detail-grid {
+  .detail-grid,
+  .document-upload {
     grid-template-columns: 1fr;
+  }
+
+  .document-upload__files {
+    grid-column: auto;
   }
 
   .responsive-grid,

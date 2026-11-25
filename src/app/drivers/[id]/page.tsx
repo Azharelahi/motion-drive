@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import GlobalErrorBanner, { type GlobalAlert } from "@/components/GlobalErrorBanner";
+import DocumentPanel from "@/components/DocumentPanel";
 import { getLicenceExpiryWarning } from "@/lib/driver-licence-warning";
 import { formatAUD, formatDateAU } from "@/lib/format";
 
@@ -292,27 +293,7 @@ export default function DriverProfilePage() {
         <Link className="button button--secondary" href="/drivers">Back to Register</Link>
       </div>
 
-      <section className="profile-card document-panel" aria-labelledby="driver-documents-title">
-        <h2 id="driver-documents-title">Driver Documents</h2>
-        {driver.documents.length === 0 ? (
-          <p>No driver documents uploaded.</p>
-        ) : (
-          <div className="table-scroll">
-            <table>
-              <thead><tr><th>Document</th><th>Expiry</th><th>Uploaded</th></tr></thead>
-              <tbody>
-                {driver.documents.map((document) => (
-                  <tr key={document.id}>
-                    <td>{document.documentType} · {document.originalName}</td>
-                    <td>{formatDateAU(document.expiryDate)}</td>
-                    <td>{formatDateAU(document.createdAt)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+      <DocumentPanel entityType="Driver" entityId={driver.id} documents={driver.documents} />
     </section>
   );
 }

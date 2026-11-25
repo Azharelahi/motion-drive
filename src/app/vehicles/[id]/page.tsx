@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import GlobalErrorBanner, { type GlobalAlert } from "@/components/GlobalErrorBanner";
+import DocumentPanel from "@/components/DocumentPanel";
 import { formatAUD, formatDateAU } from "@/lib/format";
 
 interface ContractSummary {
@@ -331,27 +332,7 @@ export default function VehicleProfilePage() {
         <Link className="button button--secondary" href="/vehicles">Back to Register</Link>
       </div>
 
-      <section className="profile-card document-panel" aria-labelledby="vehicle-documents-title">
-        <h2 id="vehicle-documents-title">Documents</h2>
-        {vehicle.documents.length === 0 ? (
-          <p>No documents uploaded.</p>
-        ) : (
-          <div className="table-scroll">
-            <table>
-              <thead><tr><th>Document</th><th>Expiry</th><th>Uploaded</th></tr></thead>
-              <tbody>
-                {vehicle.documents.map((document) => (
-                  <tr key={document.id}>
-                    <td>{document.documentType} · {document.originalName}</td>
-                    <td>{formatDateAU(document.expiryDate)}</td>
-                    <td>{formatDateAU(document.createdAt)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+      <DocumentPanel entityType="Vehicle" entityId={vehicle.id} documents={vehicle.documents} />
     </section>
   );
 }
