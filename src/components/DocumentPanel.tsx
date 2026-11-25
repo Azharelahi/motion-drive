@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { formatDateAU } from "@/lib/format";
+import { readPdfDocument, type ExtractedPdfFields } from "@/lib/pdf-reader";
 
 export type DocumentEntityType = "Driver" | "Vehicle";
 
@@ -17,10 +18,24 @@ interface DocumentPanelProps {
   entityType: DocumentEntityType;
   entityId: string;
   documents: DocumentPanelRecord[];
+  onProfileUpdated?: () => Promise<void>;
 }
 
 interface DocumentResponse extends DocumentPanelRecord {
   sizeBytes: string;
+}
+
+interface ReadProposal {
+  key: string;
+  label: string;
+  value: string;
+}
+
+interface ReadUpdateModal {
+  document: DocumentPanelRecord;
+  proposals: ReadProposal[];
+  expiryTarget: string | null;
+  scanned: boolean;
 }
 
 const documentTypes: Record<DocumentEntityType, string[]> = {
@@ -32,10 +47,56 @@ function expiryInputValue(value: string | null): string {
   return value ? value.slice(0, 10) : "";
 }
 
+function expiryProfileField(
+  entityType: DocumentEntityType,
+  documentType: string,
+): string | null {
+  if (entityType === "Driver") {
+    return documentType === "Rideshare Accreditation"
+      ? "rideshareAccreditationExpiry"
+      : "licenceExpiry";
+  }
+  if (documentType === "Insurance") return "insuranceExpiry";
+  if (documentType === "Inspection") return "inspectionExpiry";
+  if (documentType === "Registration") return "registrationExpiry";
+  return null;
+}
+
+function createReadProposals(
+  fields: ExtractedPdfFields,
+  entityType: DocumentEntityType,
+  documentType: string,
+): ReadProposal[] {
+  const proposals: ReadProposal[] = [];
+  if (entityType === "Vehicle") {
+    if (fields.registration) {
+      proposals.push({ key: "registration", label: "Registration", value: fields.registration });
+    }
+    if (fields.vin) proposals.push({ key: "vin", label: "VIN", value: fields.vin });
+  } else if (fields.licenceNumber) {
+    proposals.push({
+      key: "licenceNumber",
+      label: "Licence number",
+      value: fields.licenceNumber,
+    });
+  }
+
+  if (fields.expiryDate) {
+    const target = expiryProfileField(entityType, documentType);
+    proposals.push({
+      key: target ?? "documentExpiry",
+      label: target ? "Profile expiry date" : "Document expiry date",
+      value: fields.expiryDate,
+    });
+  }
+  return proposals;
+}
+
 export default function DocumentPanel({
   entityType,
   entityId,
   documents: initialDocuments,
+  onProfileUpdated,
 }: DocumentPanelProps) {
   const [documents, setDocuments] = useState(initialDocuments);
   const [expiryValues, setExpiryValues] = useState<Record<string, string>>(() =>
@@ -47,6 +108,12 @@ export default function DocumentPanel({
   const [expiryDate, setExpiryDate] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [readingId, setReadingId] = useState<string | null>(null);
+  const [readModal, setReadModal] = useState<ReadUpdateModal | null>(null);
+  const [proposalValues, setProposalValues] = useState<Record<string, string>>({});
+  const [selectedProposals, setSelectedProposals] = useState<Record<string, boolean>>({});
+  const [manualExpiry, setManualExpiry] = useState("");
+  const [applyingUpdates, setApplyingUpdates] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -156,6 +223,117 @@ export default function DocumentPanel({
     }
   }
 
+  async function readAndUpdate(document: DocumentPanelRecord) {
+    setReadingId(document.id);
+    setError("");
+    setSuccess("");
+    try {
+      const response = await fetch(`/api/documents/${document.id}/file`);
+      if (!response.ok) {
+        const body = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(body?.error ?? `Could not read the PDF (HTTP ${response.status}).`);
+      }
+
+      const result = await readPdfDocument(await response.arrayBuffer());
+      const proposals = createReadProposals(result.fields, entityType, document.documentType);
+      setReadModal({
+        document,
+        proposals,
+        expiryTarget: expiryProfileField(entityType, document.documentType),
+        scanned: !result.hasTextLayer,
+      });
+      setProposalValues(Object.fromEntries(proposals.map((proposal) => [proposal.key, proposal.value])));
+      setSelectedProposals(Object.fromEntries(proposals.map((proposal) => [proposal.key, true])));
+      setManualExpiry("");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not read the PDF.");
+    } finally {
+      setReadingId(null);
+    }
+  }
+
+  async function applyReadUpdates(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!readModal) return;
+
+    const selected = readModal.proposals.filter((proposal) => selectedProposals[proposal.key]);
+    const changes: Record<string, string> = {};
+    for (const proposal of selected) {
+      const value = proposalValues[proposal.key]?.trim();
+      if (value) changes[proposal.key] = value;
+    }
+
+    const expiryProposal = selected.find(
+      (proposal) =>
+        proposal.key === readModal.expiryTarget || proposal.key === "documentExpiry",
+    );
+    const expiryValue = manualExpiry || (expiryProposal ? proposalValues[expiryProposal.key] : "");
+    if (manualExpiry && readModal.expiryTarget) {
+      changes[readModal.expiryTarget] = manualExpiry;
+    }
+    delete changes.documentExpiry;
+
+    if (Object.keys(changes).length === 0 && !expiryValue) {
+      setError("Select a proposed update or enter an expiry date.");
+      return;
+    }
+
+    setApplyingUpdates(true);
+    setError("");
+    setSuccess("");
+    let profileUpdated = false;
+    try {
+      if (Object.keys(changes).length > 0) {
+        const response = await fetch(`/api/${entityType.toLowerCase()}s/${entityId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(changes),
+        });
+        const body = (await response.json().catch(() => null)) as { error?: string; details?: string } | null;
+        if (!response.ok) {
+          throw new Error([body?.error, body?.details].filter(Boolean).join(" ") || "Could not apply profile updates.");
+        }
+        profileUpdated = true;
+      }
+
+      if (expiryValue) {
+        const response = await fetch(`/api/documents/${readModal.document.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ expiryDate: expiryValue }),
+        });
+        const body = (await response.json().catch(() => null)) as
+          | { document?: DocumentResponse; error?: string }
+          | null;
+        if (!response.ok) {
+          const reason = body?.error ?? "Could not update the document expiry.";
+          throw new Error(
+            profileUpdated
+              ? `Profile updates were saved, but the document expiry was not updated. ${reason}`
+              : reason,
+          );
+        }
+        setDocuments((current) =>
+          current.map((document) =>
+            document.id === readModal.document.id
+              ? { ...document, expiryDate: body?.document?.expiryDate ?? expiryValue }
+              : document,
+          ),
+        );
+        setExpiryValues((current) => ({ ...current, [readModal.document.id]: expiryValue }));
+      }
+
+      if (profileUpdated) await onProfileUpdated?.();
+      setReadModal(null);
+      setSuccess("Confirmed updates were applied.");
+    } catch (cause) {
+      if (profileUpdated) await onProfileUpdated?.();
+      setError(cause instanceof Error ? cause.message : "Could not apply the proposed updates.");
+    } finally {
+      setApplyingUpdates(false);
+    }
+  }
+
   return (
     <section className="profile-card document-panel" aria-labelledby={`documents-title-${entityId}`}>
       <h2 id={`documents-title-${entityId}`}>{entityType} Documents</h2>
@@ -242,6 +420,16 @@ export default function DocumentPanel({
                       >
                         Download
                       </a>
+                      {document.originalName.toLowerCase().endsWith(".pdf") ? (
+                        <button
+                          className="button button--secondary"
+                          type="button"
+                          disabled={readingId === document.id}
+                          onClick={() => void readAndUpdate(document)}
+                        >
+                          {readingId === document.id ? "Reading…" : "Read & Update"}
+                        </button>
+                      ) : null}
                       <button
                         className="button button--danger"
                         type="button"
@@ -257,6 +445,80 @@ export default function DocumentPanel({
           </table>
         </div>
       )}
+
+      {readModal ? (
+        <div className="document-modal-backdrop">
+          <section
+            className="document-read-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="document-read-title"
+          >
+            <h2 id="document-read-title">Read &amp; Update</h2>
+            <p className="document-read-modal__filename">{readModal.document.originalName}</p>
+            {readModal.scanned || readModal.proposals.length === 0 ? (
+              <p className="document-read-modal__manual-note" role="status">
+                {readModal.scanned
+                  ? "This PDF has no selectable text, as with a scanned image. Enter the expiry date manually."
+                  : "No supported profile fields were detected. You can enter the expiry date manually."}
+              </p>
+            ) : (
+              <p>Review the proposed values. Only checked updates will be applied.</p>
+            )}
+
+            <form onSubmit={applyReadUpdates}>
+              {readModal.proposals.map((proposal) => (
+                <label className="document-read-proposal" key={proposal.key}>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(selectedProposals[proposal.key])}
+                    onChange={(event) =>
+                      setSelectedProposals((current) => ({
+                        ...current,
+                        [proposal.key]: event.target.checked,
+                      }))
+                    }
+                  />
+                  <span>{proposal.label}</span>
+                  <input
+                    aria-label={`Proposed ${proposal.label}`}
+                    type={proposal.key.toLowerCase().includes("expiry") ? "date" : "text"}
+                    value={proposalValues[proposal.key] ?? ""}
+                    onChange={(event) =>
+                      setProposalValues((current) => ({
+                        ...current,
+                        [proposal.key]: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+              ))}
+
+              <label className="document-read-modal__expiry">
+                {readModal.expiryTarget ? "Manual profile expiry date" : "Manual document expiry date"}
+                <input
+                  type="date"
+                  value={manualExpiry}
+                  onChange={(event) => setManualExpiry(event.target.value)}
+                />
+              </label>
+              <div className="document-read-modal__actions">
+                <button
+                  className="button button--secondary"
+                  type="button"
+                  disabled={applyingUpdates}
+                  onClick={() => setReadModal(null)}
+                >
+                  Cancel
+                </button>
+                <button className="button button--primary" type="submit" disabled={applyingUpdates}>
+                  {applyingUpdates ? "Applying…" : "Apply selected updates"}
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
+      ) : null}
     </section>
   );
 }

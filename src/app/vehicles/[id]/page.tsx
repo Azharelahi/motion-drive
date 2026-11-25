@@ -119,8 +119,8 @@ export default function VehicleProfilePage() {
   const [alert, setAlert] = useState<GlobalAlert | null>(null);
   const [editForm, setEditForm] = useState<EditForm | null>(null);
 
-  const loadVehicle = useCallback(async () => {
-    setLoading(true);
+  const loadVehicle = useCallback(async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const response = await fetch(`/api/vehicles/${vehicleId}`, { cache: "no-store" });
       const body = (await response.json()) as { vehicle?: VehicleProfile; error?: string };
@@ -135,7 +135,7 @@ export default function VehicleProfilePage() {
         message: error instanceof Error ? error.message : "Could not load the vehicle.",
       });
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   }, [vehicleId]);
 
@@ -332,7 +332,12 @@ export default function VehicleProfilePage() {
         <Link className="button button--secondary" href="/vehicles">Back to Register</Link>
       </div>
 
-      <DocumentPanel entityType="Vehicle" entityId={vehicle.id} documents={vehicle.documents} />
+      <DocumentPanel
+        entityType="Vehicle"
+        entityId={vehicle.id}
+        documents={vehicle.documents}
+        onProfileUpdated={() => loadVehicle(false)}
+      />
     </section>
   );
 }

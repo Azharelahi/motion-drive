@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: shell-responsive-print.spec.ts >> print layout isolates swap-agreement-view
-- Location: tests\e2e\shell-responsive-print.spec.ts:28:3
+- Name: document-read-update.spec.ts >> Read & Update prompts manual expiry for scanned PDFs
+- Location: tests\e2e\document-read-update.spec.ts:119:1
 
 # Error details
 

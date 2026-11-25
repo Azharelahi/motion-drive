@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: shell-responsive-print.spec.ts >> print layout isolates rental-contract-view
-- Location: tests\e2e\shell-responsive-print.spec.ts:28:3
+- Name: document-read-update.spec.ts >> Read & Update proposes text-PDF fields for confirmation
+- Location: tests\e2e\document-read-update.spec.ts:79:1
 
 # Error details
 

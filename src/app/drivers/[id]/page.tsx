@@ -108,8 +108,8 @@ export default function DriverProfilePage() {
   const [submitting, setSubmitting] = useState(false);
   const [alert, setAlert] = useState<GlobalAlert | null>(null);
 
-  const loadDriver = useCallback(async () => {
-    setLoading(true);
+  const loadDriver = useCallback(async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const response = await fetch(`/api/drivers/${driverId}`, { cache: "no-store" });
       const body = (await response.json()) as { driver?: DriverProfile; error?: string };
@@ -124,7 +124,7 @@ export default function DriverProfilePage() {
         message: error instanceof Error ? error.message : "Could not load the driver.",
       });
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   }, [driverId]);
 
@@ -293,7 +293,12 @@ export default function DriverProfilePage() {
         <Link className="button button--secondary" href="/drivers">Back to Register</Link>
       </div>
 
-      <DocumentPanel entityType="Driver" entityId={driver.id} documents={driver.documents} />
+      <DocumentPanel
+        entityType="Driver"
+        entityId={driver.id}
+        documents={driver.documents}
+        onProfileUpdated={() => loadDriver(false)}
+      />
     </section>
   );
 }
