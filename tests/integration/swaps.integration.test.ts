@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { prisma } from "../../src/lib/db";
-import { POST as createSwap } from "../../src/app/api/swaps/route";
+import { GET as getSwaps, POST as createSwap } from "../../src/app/api/swaps/route";
 
 const suffix = Date.now().toString().slice(-9);
 const swapDate = "2026-11-25";
@@ -259,5 +259,27 @@ describe("vehicle swap API integration", () => {
     expect(activeContracts.every((contract) => contract.swapId === swapRecord.id)).toBe(true);
     expect(vehicles.every((vehicle) => vehicle.status === "Rented")).toBe(true);
     expect(drivers.every((driver) => driver.status === "Current")).toBe(true);
+
+    const listResponse = await getSwaps();
+    expect(listResponse.status).toBe(200);
+    const listBody = (await listResponse.json()) as {
+      activeRentals: Array<{ driver: { id: string }; vehicle: { id: string } }>;
+      swaps: Array<{ id: string; swapNumber: string }>;
+    };
+    expect(listBody.activeRentals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          driver: expect.objectContaining({ id: driverOneId }),
+          vehicle: expect.objectContaining({ id: vehicleTwoId }),
+        }),
+        expect.objectContaining({
+          driver: expect.objectContaining({ id: driverTwoId }),
+          vehicle: expect.objectContaining({ id: vehicleOneId }),
+        }),
+      ]),
+    );
+    expect(listBody.swaps).toContainEqual(
+      expect.objectContaining({ id: swapRecord.id, swapNumber: swapRecord.swapNumber }),
+    );
   });
 });

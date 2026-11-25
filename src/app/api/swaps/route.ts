@@ -65,6 +65,62 @@ function nextSwapNumber(
   return `${prefix}${String(lastSequence + 1).padStart(3, "0")}`;
 }
 
+export async function GET() {
+  try {
+    const [activeRentals, swaps] = await Promise.all([
+      prisma.contract.findMany({
+        where: { status: "Active" },
+        select: {
+          id: true,
+          startDate: true,
+          weeklyRent: true,
+          driver: { select: { id: true, name: true, mobile: true } },
+          vehicle: {
+            select: { id: true, registration: true, make: true, model: true, weeklyRent: true },
+          },
+        },
+        orderBy: [{ startDate: "asc" }, { createdAt: "asc" }],
+      }),
+      prisma.vehicleSwap.findMany({
+        include: {
+          driverOne: { select: { id: true, name: true } },
+          driverTwo: { select: { id: true, name: true } },
+          vehicleOne: { select: { id: true, registration: true, model: true } },
+          vehicleTwo: { select: { id: true, registration: true, model: true } },
+        },
+        orderBy: [{ swapDate: "desc" }, { createdAt: "desc" }],
+      }),
+    ]);
+
+    return NextResponse.json(
+      {
+        activeRentals: activeRentals.map((rental) => ({
+          ...rental,
+          startDate: rental.startDate.toISOString(),
+          weeklyRent: rental.weeklyRent.toString(),
+          vehicle: {
+            ...rental.vehicle,
+            weeklyRent: rental.vehicle.weeklyRent.toString(),
+          },
+        })),
+        swaps: swaps.map((swap) => ({
+          ...swap,
+          swapDate: swap.swapDate.toISOString(),
+          newRentOne: swap.newRentOne.toString(),
+          newRentTwo: swap.newRentTwo.toString(),
+        })),
+      },
+      { headers: { "Cache-Control": "no-store" } },
+    );
+  } catch (error) {
+    console.error("Vehicle swaps load failed", error);
+    return NextResponse.json(
+      { error: "Could not load active rentals and saved swaps." },
+      { status: 500, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+}
+
 export async function POST(request: Request) {
   let body: unknown;
   try {
