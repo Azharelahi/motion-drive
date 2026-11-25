@@ -20,4 +20,10 @@ describe("getLicenceExpiryWarning", () => {
   it("does not warn when expiry is more than 90 days away", () => {
     expect(getLicenceExpiryWarning("2026-04-02", "2026-01-01")).toBeNull();
   });
+
+  it("accepts valid ISO date-time strings returned by Prisma JSON serialization", () => {
+    expect(
+      getLicenceExpiryWarning("2027-03-23T00:00:00.000Z", "2026-11-25"),
+    ).toBeNull();
+  });
 });

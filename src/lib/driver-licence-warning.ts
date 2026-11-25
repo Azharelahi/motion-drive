@@ -14,11 +14,17 @@ export function getLicenceExpiryWarning(
   if (!expiry) {
     return { kind: "missing", message: "Driver licence expiry date is missing." };
   }
-  if (!isoDateSchema.safeParse(expiry).success) {
+
+  const datePart = /^(\d{4}-\d{2}-\d{2})(?:T.*)?$/.exec(expiry)?.[1];
+  if (
+    !datePart ||
+    !isoDateSchema.safeParse(datePart).success ||
+    (expiry.includes("T") && !Number.isFinite(new Date(expiry).getTime()))
+  ) {
     return { kind: "invalid", message: "Driver licence expiry date is invalid." };
   }
 
-  const remainingDays = daysUntil(expiry, today);
+  const remainingDays = daysUntil(datePart, today);
   if (remainingDays === null) {
     return { kind: "invalid", message: "Driver licence expiry date is invalid." };
   }
