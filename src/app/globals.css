@@ -668,6 +668,83 @@ body {
   line-height: 1.45;
 }
 
+.rental-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+.rental-steps li {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.8rem;
+  border: 1px solid #dfe5ec;
+  border-radius: 0.55rem;
+  color: #667085;
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.rental-steps li span {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.rental-steps .rental-steps__active {
+  color: #12304d;
+  border-color: #155e9b;
+  background: #eff7ff;
+}
+
+.rental-field {
+  display: grid;
+  max-width: 42rem;
+  gap: 0.4rem;
+  color: #344054;
+  font-weight: 700;
+}
+
+.rental-field select {
+  min-height: 2.7rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid #bfc7d1;
+  border-radius: 0.45rem;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+}
+
+.rental-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: #f1f5f9;
+  font-weight: 700;
+}
+
+.form-hint {
+  color: #754800;
+}
+
+.contract-created__status {
+  display: inline-block;
+  padding: 0.4rem 0.7rem;
+  color: #17623a;
+  border-radius: 99px;
+  background: #effaf3;
+  font-weight: 700;
+}
+
+.contract-created__details {
+  margin: 1.25rem 0;
+}
+
 .responsive-grid,
 .data-grid,
 .vehicle-grid,
@@ -743,6 +820,10 @@ body {
   .profile-grid,
   .detail-grid,
   .document-upload {
+    grid-template-columns: 1fr;
+  }
+
+  .rental-steps {
     grid-template-columns: 1fr;
   }
 
