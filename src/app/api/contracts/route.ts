@@ -44,6 +44,29 @@ function nextContractNumber(contractNumbers: string[], year: number): string {
   return `${prefix}${String(sequence).padStart(4, "0")}`;
 }
 
+export async function GET() {
+  try {
+    const contracts = await prisma.contract.findMany({
+      include: {
+        driver: { select: { id: true, name: true, mobile: true } },
+        vehicle: { select: { id: true, registration: true, make: true, model: true } },
+      },
+      orderBy: [{ startDate: "desc" }, { createdAt: "desc" }],
+    });
+
+    return NextResponse.json(
+      { contracts },
+      { headers: { "Cache-Control": "no-store" } },
+    );
+  } catch (error) {
+    console.error("Contract register load failed", error);
+    return NextResponse.json(
+      { error: "Could not load saved contracts." },
+      { status: 500, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+}
+
 export async function POST(request: Request) {
   let body: unknown;
   try {

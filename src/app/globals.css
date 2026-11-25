@@ -745,6 +745,91 @@ body {
   margin: 1.25rem 0;
 }
 
+.contract-search {
+  display: grid;
+  max-width: 42rem;
+  gap: 0.4rem;
+  margin: 0 0 1.25rem;
+  color: #344054;
+  font-weight: 700;
+}
+
+.contract-search input {
+  min-height: 2.7rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #bfc7d1;
+  border-radius: 0.45rem;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+}
+
+.contracts-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid #dfe5ec;
+  border-radius: 0.65rem;
+  background: #fff;
+}
+
+.app-main .contracts-table {
+  width: 100%;
+  min-width: 68rem;
+  border-collapse: collapse;
+}
+
+.contracts-table th,
+.contracts-table td {
+  padding: 0.7rem;
+  border-bottom: 1px solid #e6eaf0;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.contracts-table th {
+  color: #475467;
+  background: #f8fafc;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.contracts-table__model {
+  display: block;
+  margin-top: 0.15rem;
+  color: #667085;
+  font-size: 0.82rem;
+}
+
+.contract-status {
+  display: inline-flex;
+  padding: 0.3rem 0.6rem;
+  border-radius: 99px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.contract-status--active {
+  color: #17623a;
+  background: #effaf3;
+}
+
+.contract-status--ended {
+  color: #475467;
+  background: #eef1f5;
+}
+
+.contracts-table__actions {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.contracts-table__actions .button {
+  min-height: 2.2rem;
+  padding: 0.4rem 0.65rem;
+  white-space: nowrap;
+}
+
 .contract-view-toolbar {
   display: flex;
   align-items: center;
