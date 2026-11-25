@@ -347,6 +347,23 @@ body {
   justify-self: start;
 }
 
+.responsive-grid,
+.data-grid,
+.vehicle-grid,
+.driver-grid,
+.contract-grid,
+.swap-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.responsive-grid--three,
+.contract-grid,
+.swap-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 @media (max-width: 600px) {
   .app-shell {
     grid-template-columns: 1fr;
@@ -400,5 +417,99 @@ body {
 
   .confirmation-dialog__content {
     padding: 1.2rem;
+  }
+
+  .responsive-grid,
+  .responsive-grid--three,
+  .data-grid,
+  .vehicle-grid,
+  .driver-grid,
+  .contract-grid,
+  .swap-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .app-main table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  :root,
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  body,
+  .app-shell,
+  .app-workspace,
+  .app-main {
+    display: block;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .app-sidebar,
+  .app-topbar,
+  .app-shell__message,
+  .global-alert,
+  .confirmation-dialog,
+  button,
+  nav,
+  input,
+  textarea,
+  select {
+    display: none !important;
+  }
+
+  .app-main {
+    width: 100%;
+    max-width: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  body:has(.rental-contract-view) .app-main > *:not(.rental-contract-view),
+  body:has(.swap-agreement-view) .app-main > *:not(.swap-agreement-view),
+  body:has(.rental-contract-view) .app-main > .rental-contract-view ~ *,
+  body:has(.swap-agreement-view) .app-main > .swap-agreement-view ~ * {
+    display: none !important;
+  }
+
+  .rental-contract-view,
+  .swap-agreement-view {
+    display: block;
+    width: 100%;
+    max-width: none;
+  }
+
+  .rental-contract-view *,
+  .swap-agreement-view * {
+    box-shadow: none;
+  }
+
+  .rental-contract-view table,
+  .swap-agreement-view table {
+    width: 100%;
+  }
+
+  .rental-contract-view thead,
+  .swap-agreement-view thead {
+    display: table-header-group;
+  }
+
+  .rental-contract-view tr,
+  .swap-agreement-view tr {
+    break-inside: avoid;
   }
 }
