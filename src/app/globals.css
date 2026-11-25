@@ -745,6 +745,226 @@ body {
   margin: 1.25rem 0;
 }
 
+.contract-view-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.contract-view-toolbar p {
+  margin: 0;
+  color: #475467;
+}
+
+.rental-contract-view {
+  width: min(100%, 58rem);
+  margin: 0 auto;
+  padding: 2rem;
+  color: #172033;
+  background: #fff;
+  border: 1px solid #dfe5ec;
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 26px rgb(16 24 40 / 8%);
+}
+
+.rental-contract-view__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #12304d;
+}
+
+.rental-contract-view__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.rental-contract-view__logo {
+  display: grid;
+  flex: 0 0 3.5rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  place-items: center;
+  border: 2px solid #d9ad22;
+  border-radius: 50%;
+  color: #12304d;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.rental-contract-view__brand h1 {
+  margin: 0.15rem 0;
+  color: #12304d;
+  font-size: 1.35rem;
+}
+
+.rental-contract-view__brand p {
+  margin: 0.2rem 0;
+}
+
+.rental-contract-view__eyebrow {
+  color: #667085;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rental-contract-view__company {
+  display: grid;
+  align-content: start;
+  gap: 0.3rem;
+  max-width: 20rem;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.rental-contract-view__draft-note {
+  margin: 1rem 0 0;
+  padding: 0.65rem 0.8rem;
+  color: #694900;
+  border: 1px solid #e8cf84;
+  background: #fff8df;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.rental-contract-view__section:not(.rental-contract-view__annexure) {
+  margin-top: 1.5rem;
+  break-inside: avoid;
+}
+
+.rental-contract-view__section h2 {
+  margin: 0 0 0.8rem;
+  color: #12304d;
+  font-size: 1.1rem;
+}
+
+.rental-contract-view__terms {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid #dfe5ec;
+  border-left: 1px solid #dfe5ec;
+}
+
+.rental-contract-view__terms div {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.85fr) minmax(0, 1.15fr);
+  gap: 0.5rem;
+  padding: 0.6rem 0.7rem;
+  border-right: 1px solid #dfe5ec;
+  border-bottom: 1px solid #dfe5ec;
+}
+
+.rental-contract-view__terms dt {
+  color: #475467;
+  font-weight: 700;
+}
+
+.rental-contract-view__terms dd {
+  margin: 0;
+}
+
+.rental-contract-view table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  table-layout: fixed;
+}
+
+.rental-contract-view th,
+.rental-contract-view td {
+  padding: 0.6rem;
+  border: 1px solid #dfe5ec;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.rental-contract-view th {
+  width: 18%;
+  color: #344054;
+  background: #f4f6f8;
+}
+
+.rental-contract-view__key-terms {
+  padding: 1rem 1.15rem;
+  border-left: 4px solid #d9ad22;
+  background: #f8fafc;
+}
+
+.rental-contract-view__key-terms ul {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.rental-contract-view__annexure > h2 {
+  margin-bottom: 1rem;
+}
+
+.rental-contract-view__annexure ol {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0;
+  padding-left: 1.65rem;
+}
+
+.rental-contract-view__annexure li {
+  padding-left: 0.2rem;
+  break-inside: avoid;
+}
+
+.rental-contract-view__annexure li h3 {
+  margin: 0 0 0.25rem;
+  color: #172033;
+  font-size: 0.95rem;
+}
+
+.rental-contract-view__annexure li p,
+.rental-contract-view__signatures > p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.rental-contract-view__signature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem 2rem;
+  margin-top: 2rem;
+}
+
+.rental-contract-view__signature-grid div {
+  display: grid;
+  gap: 0.35rem;
+  color: #475467;
+  font-size: 0.82rem;
+}
+
+.rental-contract-view__signature-grid i {
+  display: block;
+  min-height: 2.4rem;
+  border-bottom: 1px solid #667085;
+  color: #172033;
+  font-style: normal;
+}
+
+.rental-contract-view__footer {
+  margin-top: 2rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #dfe5ec;
+  color: #667085;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
 .responsive-grid,
 .data-grid,
 .vehicle-grid,
@@ -825,6 +1045,30 @@ body {
 
   .rental-steps {
     grid-template-columns: 1fr;
+  }
+
+  .contract-view-toolbar,
+  .rental-contract-view__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .rental-contract-view {
+    padding: 1rem;
+  }
+
+  .rental-contract-view__terms,
+  .rental-contract-view__signature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rental-contract-view table {
+    font-size: 0.78rem;
+  }
+
+  .rental-contract-view th,
+  .rental-contract-view td {
+    padding: 0.4rem;
   }
 
   .document-upload__files {
@@ -931,6 +1175,10 @@ body {
 
   .rental-contract-view tr,
   .swap-agreement-view tr {
+    break-inside: avoid;
+  }
+
+  .rental-contract-view__clause {
     break-inside: avoid;
   }
 }
