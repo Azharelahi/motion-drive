@@ -40,7 +40,9 @@ export async function GET() {
       include: {
         contracts: {
           where: { status: "Active" },
-          include: { driver: true },
+          include: {
+            driver: { select: { id: true, name: true, mobile: true } },
+          },
           orderBy: { startDate: "desc" },
         },
         _count: { select: { documents: true } },
