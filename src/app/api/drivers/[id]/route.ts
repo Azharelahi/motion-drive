@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { driverInputSchema } from "@/lib/validation";
+import { requireAdmin } from "@/lib/route-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,9 @@ export async function GET(
   _request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   const { id } = await context.params;
   try {
     const driver = await prisma.driver.findUnique({
@@ -61,6 +65,9 @@ export async function PATCH(
   request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   const { id } = await context.params;
   try {
     let body: unknown;
@@ -124,6 +131,9 @@ export async function DELETE(
   _request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   const { id } = await context.params;
   try {
     const driver = await prisma.driver.findUnique({

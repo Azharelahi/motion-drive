@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { contractInputSchema } from "@/lib/validation";
+import { requireAdmin } from "@/lib/route-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -45,6 +46,9 @@ function nextContractNumber(contractNumbers: string[], year: number): string {
 }
 
 export async function GET() {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   try {
     const contracts = await prisma.contract.findMany({
       include: {
@@ -68,6 +72,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   let body: unknown;
   try {
     body = await request.json();

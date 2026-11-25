@@ -7,6 +7,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Admin {
+  id               String    @id @default(cuid())
+  username         String    @unique @db.VarChar(80)
+  passwordHash     String    @db.VarChar(255)
+  sessionToken     String?   @unique @db.VarChar(255)
+  sessionExpiresAt DateTime? @db.Timestamptz(3)
+  createdAt        DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime  @updatedAt @db.Timestamptz(3)
+
+  @@index([sessionExpiresAt])
+}
+
 model Vehicle {
   id                 String         @id @default(cuid())
   registration       String         @unique @db.VarChar(16)

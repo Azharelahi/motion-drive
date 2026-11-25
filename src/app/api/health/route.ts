@@ -4,6 +4,7 @@ import { constants } from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { requireAdmin } from "@/lib/route-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,9 @@ async function checkStorage(): Promise<boolean> {
 }
 
 export async function GET() {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   const [database, storage] = await Promise.all([
     prisma
       .$queryRaw`SELECT 1`

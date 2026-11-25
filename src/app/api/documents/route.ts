@@ -10,6 +10,7 @@ import {
   type StoredUpload,
 } from "@/lib/storage";
 import { documentEntityTypeSchema, isoDateSchema } from "@/lib/validation";
+import { requireAdmin } from "@/lib/route-auth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -49,6 +50,9 @@ async function removeSavedUploads(uploads: StoredUpload[]): Promise<void> {
 }
 
 export async function POST(request: Request) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   const savedUploads: StoredUpload[] = [];
   try {
     if (!request.headers.get("content-type")?.toLowerCase().startsWith("multipart/form-data")) {

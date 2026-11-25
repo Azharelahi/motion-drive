@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { swapInputSchema } from "@/lib/validation";
+import { requireAdmin } from "@/lib/route-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -66,6 +67,9 @@ function nextSwapNumber(
 }
 
 export async function GET() {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   try {
     const [activeRentals, swaps] = await Promise.all([
       prisma.contract.findMany({
@@ -122,6 +126,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   let body: unknown;
   try {
     body = await request.json();

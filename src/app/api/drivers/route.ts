@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { driverInputSchema } from "@/lib/validation";
+import { requireAdmin } from "@/lib/route-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +31,9 @@ function driverData(input: z.infer<typeof driverInputSchema>) {
 }
 
 export async function GET() {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   try {
     const drivers = await prisma.driver.findMany({
       include: {
@@ -57,6 +61,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   try {
     let body: unknown;
     try {

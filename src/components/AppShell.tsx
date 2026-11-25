@@ -7,6 +7,7 @@ import {
   CarFront,
   Download,
   LayoutDashboard,
+  LogOut,
   Upload,
   UserRound,
   FileText,
@@ -28,6 +29,23 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const importInputRef = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
   const [message, setMessage] = useState("");
+
+  if (pathname === "/login") return <>{children}</>;
+
+  async function signOut() {
+    setMessage("");
+    try {
+      const response = await fetch("/api/auth/logout", { method: "POST" });
+      if (response.status === 401) {
+        window.location.assign("/login");
+        return;
+      }
+      if (!response.ok) throw new Error("Could not sign out.");
+      window.location.assign("/login");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not sign out.");
+    }
+  }
 
   async function exportBackup() {
     setMessage("");
@@ -130,7 +148,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
             <strong>Motion Drive Rental Manager</strong>
             <span>Motion Drive Pty Ltd</span>
           </div>
-          <div className="app-topbar__actions" aria-label="Backup actions">
+          <div className="app-topbar__actions" aria-label="Application actions">
+            <button className="button button--secondary" type="button" onClick={signOut}>
+              <LogOut aria-hidden="true" size={17} />
+              Sign out
+            </button>
             <button className="button button--secondary" type="button" onClick={exportBackup}>
               <Download aria-hidden="true" size={17} />
               Export backup

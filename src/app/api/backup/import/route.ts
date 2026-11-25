@@ -4,6 +4,7 @@ import {
   restoreBackup,
 } from "@/lib/backup-restore";
 import { BackupValidationError } from "@/lib/backup-validation";
+import { requireAdmin } from "@/lib/route-auth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -68,6 +69,9 @@ async function readJsonBody(request: Request): Promise<unknown> {
 }
 
 export async function POST(request: Request) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   try {
     const backup = await readJsonBody(request);
     await restoreBackup(backup);

@@ -8,7 +8,7 @@
 
 2. **Keep the Architecture Simple & Clean:** Use standard Next.js App Router pages, simple server/API helpers, PostgreSQL transactions (`prisma.$transaction`), and a plain file folder (`./storage/uploads`) for files up to **25 MB**. Avoid heavy enterprise abstractions or over-nested layers.
 
-3. **Do Not Build Unrequested Features:** No rent payment ledger/tracking, no login/auth wall, and no automated reminders to drivers (alerts stay on-screen only).
+3. **Do Not Build Unrequested Features:** No rent payment ledger/tracking or automated reminders to drivers (alerts stay on-screen only). Admin sign-in and protected application access are required.
 
 4. **Standard Formatting:**
 
@@ -220,3 +220,10 @@ motion-drive/
 * **Step 10.2 — Final Full Regression Run:** Run all unit, integration, and Playwright E2E tests together after a clean seed and backup/restore cycle.
 
   * *Check:* Run `npm run build && npx vitest run && npx playwright test` with 0 failures.
+
+* **Step 11.1 — Admin Access Protection:** Protect every application page and API route with the seeded administrator account. Keep only the sign-in page and sign-in endpoint public; protect health, session-status, logout, document, backup, and business-data routes. Proxy redirects unauthenticated pages and requires a session cookie on API requests; every API handler independently validates that session against the database.
+
+  * Replace any existing admin records and seed one new admin with `npm run admin:replace`. Set `ADMIN_USERNAME` and a unique `ADMIN_PASSWORD` of at least 12 characters in `.env` first; the command applies pending Prisma migrations, deletes existing admin rows, and creates the replacement atomically. It does not modify rental data. Never commit `.env`.
+  * Use a server-validated, random session token stored as a hash in the database. Keep the browser cookie `HttpOnly`, `SameSite=Lax`, and `Secure` in production. The session expires after **8 hours**; signing out revokes it immediately.
+
+  * *Check:* Open the local app in a signed-out browser and confirm the admin sign-in page appears. Unauthenticated API requests return `401`; wrong credentials do not open the app; the correct username and password open the dashboard; the session remains valid across browser restarts until its 8-hour expiry; and Sign out returns the user to sign-in.

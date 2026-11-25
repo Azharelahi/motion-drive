@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { ContractActionError, endContract } from "@/lib/contract-lifecycle";
+import { requireAdmin } from "@/lib/route-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -8,6 +9,9 @@ export async function POST(
   _request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   const { id } = await context.params;
   try {
     const contract = await endContract(id);

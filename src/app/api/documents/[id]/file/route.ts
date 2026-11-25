@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { readStoredFile } from "@/lib/storage";
+import { requireAdmin } from "@/lib/route-auth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -17,6 +18,9 @@ export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   const { id } = await context.params;
   try {
     const document = await prisma.document.findUnique({

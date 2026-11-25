@@ -4,6 +4,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { deleteStoredFile } from "@/lib/storage";
 import { isoDateSchema } from "@/lib/validation";
+import { requireAdmin } from "@/lib/route-auth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -23,6 +24,9 @@ export async function PATCH(
   request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   const { id } = await context.params;
   try {
     let body: unknown;
@@ -64,6 +68,9 @@ export async function DELETE(
   _request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   const { id } = await context.params;
   try {
     const document = await prisma.document.findUnique({
