@@ -830,6 +830,191 @@ body {
   white-space: nowrap;
 }
 
+.dashboard-page > section + section {
+  margin-top: 2rem;
+}
+
+.dashboard-page h2 {
+  margin: 0 0 0.85rem;
+  color: #12304d;
+  font-size: 1.2rem;
+}
+
+.dashboard-counters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.dashboard-counter {
+  display: grid;
+  gap: 0.7rem;
+  min-height: 6rem;
+  padding: 1rem;
+  color: #344054;
+  border: 1px solid #dfe5ec;
+  border-radius: 0.65rem;
+  background: #f8fafc;
+  text-decoration: none;
+}
+
+.dashboard-counter:hover {
+  border-color: #155e9b;
+  background: #eff7ff;
+}
+
+.dashboard-counter strong {
+  color: #12304d;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.dashboard-alerts {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid #f1d08e;
+  border-radius: 0.55rem;
+  background: #fff8e8;
+}
+
+.dashboard-alert--critical {
+  border-color: #f1b7bb;
+  background: #fff1f2;
+}
+
+.dashboard-alert p {
+  margin: 0.2rem 0 0;
+  color: #475467;
+}
+
+.dashboard-alert > a {
+  flex: 0 0 auto;
+  font-weight: 700;
+}
+
+.dashboard-empty {
+  margin: 0;
+  padding: 1rem;
+  color: #17623a;
+  border: 1px solid #a9d9bd;
+  border-radius: 0.55rem;
+  background: #effaf3;
+  font-weight: 700;
+}
+
+.dashboard-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid #dfe5ec;
+  border-radius: 0.65rem;
+  background: #fff;
+}
+
+.app-main .dashboard-table {
+  width: 100%;
+  min-width: 62rem;
+  border-collapse: collapse;
+}
+
+.app-main .dashboard-table--drivers {
+  min-width: 76rem;
+}
+
+.app-main .dashboard-table--recent {
+  min-width: 70rem;
+}
+
+.dashboard-table th,
+.dashboard-table td {
+  padding: 0.7rem;
+  border-bottom: 1px solid #e6eaf0;
+  text-align: left;
+  vertical-align: top;
+}
+
+.dashboard-table th {
+  color: #475467;
+  background: #f8fafc;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.dashboard-table td > strong,
+.dashboard-table td > span {
+  display: block;
+}
+
+.dashboard-table td > span {
+  margin-top: 0.15rem;
+  color: #667085;
+  font-size: 0.82rem;
+}
+
+.expiry-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  margin: 0.25rem 0;
+  padding: 0.25rem 0.5rem;
+  color: #17623a;
+  border-radius: 0.4rem;
+  background: #effaf3;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.expiry-badge small {
+  font-size: 0.68rem;
+  font-weight: 500;
+}
+
+.expiry-badge--due {
+  color: #754800;
+  background: #fff8e8;
+}
+
+.expiry-badge--expired,
+.expiry-badge--invalid {
+  color: #8a1c23;
+  background: #fff1f2;
+}
+
+.expiry-badge--missing {
+  color: #667085;
+  background: #eef1f5;
+}
+
+.dashboard-document-list {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 17rem;
+  margin: 0;
+  padding-left: 1rem;
+}
+
+.dashboard-document-list li {
+  overflow-wrap: anywhere;
+}
+
+.dashboard-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
 .contract-view-toolbar {
   display: flex;
   align-items: center;
@@ -1171,6 +1356,10 @@ body {
 
   .rental-steps {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-counters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .contract-view-toolbar,
