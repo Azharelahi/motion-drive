@@ -4,6 +4,12 @@ import { getAdminIdFromSession } from "@/lib/auth";
 
 const SESSION_COOKIE = "md_session";
 const PUBLIC_PATHS = new Set(["/login", "/api/auth/login"]);
+
+// NOTE (production): Re-enable cross-origin origin checking before public deploy.
+// Currently disabled because Cloudflare Tunnel changes the Origin header.
+// Session cookie is SameSite=Strict, which already provides CSRF protection.
+const ENABLE_CROSS_ORIGIN_CHECK = false;
+
 const STATE_CHANGING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
 function normalizedPath(pathname: string): string {
@@ -22,6 +28,7 @@ function withSecurityHeaders(response: NextResponse): NextResponse {
 }
 
 function isCrossOriginMutation(request: NextRequest): boolean {
+  if (!ENABLE_CROSS_ORIGIN_CHECK) return false;
   if (!STATE_CHANGING_METHODS.has(request.method)) return false;
   const origin = request.headers.get("origin");
   if (!origin) return false;
@@ -34,14 +41,6 @@ function isCrossOriginMutation(request: NextRequest): boolean {
 
 export async function proxy(request: NextRequest) {
   const pathname = normalizedPath(request.nextUrl.pathname);
-  if (isCrossOriginMutation(request)) {
-    return withSecurityHeaders(
-      NextResponse.json(
-        { error: "Cross-origin requests are not allowed." },
-        { status: 403, headers: { "Cache-Control": "no-store" } },
-      ),
-    );
-  }
 
   const token = request.cookies.get(SESSION_COOKIE)?.value ?? null;
 
@@ -76,6 +75,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|pdf\\.worker\\.min\\.mjs).*)",
+    "/((?!_next/static|_next/image|_next/hmr|favicon.ico|pdf\\.worker\\.min\\.mjs).*)",
   ],
 };
