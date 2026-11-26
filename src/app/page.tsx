@@ -66,10 +66,10 @@ const counterLinks = [
 ] as const;
 
 const quickActions = [
-  { label: "Create New Contract", href: "/rentals/new", style: "primary" },
-  { label: "Swap Cars", href: "/swaps", style: "secondary" },
-  { label: "Add or View Vehicles", href: "/vehicles", style: "secondary" },
-  { label: "Add or View Drivers", href: "/drivers", style: "secondary" },
+  { label: "Create new rental agreement", href: "/rentals/new", style: "primary" },
+  { label: "Swap vehicles between drivers", href: "/swaps", style: "secondary" },
+  { label: "Manage vehicle register", href: "/vehicles", style: "secondary" },
+  { label: "Manage driver register", href: "/drivers", style: "secondary" },
 ] as const;
 
 function expiryLabel(expiry: ExpiryDisplay): string {

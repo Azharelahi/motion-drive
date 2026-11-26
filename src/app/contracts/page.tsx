@@ -183,7 +183,7 @@ export default function ContractsPage() {
                         className="button button--secondary"
                         href={`/contracts/${contract.id}`}
                       >
-                        Open
+                        View agreement
                       </Link>
                       {contract.status === "Active" ? (
                         <button
@@ -191,7 +191,7 @@ export default function ContractsPage() {
                           type="button"
                           onClick={() => setPendingAction({ contract, action: "end" })}
                         >
-                          Mark Ended
+                          End rental
                         </button>
                       ) : contract.status === "Ended" ? (
                         <button
@@ -199,7 +199,7 @@ export default function ContractsPage() {
                           type="button"
                           onClick={() => setPendingAction({ contract, action: "reopen" })}
                         >
-                          Reopen
+                          Reopen rental
                         </button>
                       ) : null}
                     </div>

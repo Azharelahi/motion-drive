@@ -216,111 +216,120 @@ export default function SwapsPage() {
               <p className="form-hint">At least two active rentals are required to make a swap.</p>
             ) : null}
 
-            <div className="swap-grid">
-              <label>
-                Driver one *
-                <select required value={driverOneId} onChange={(event) => setDriverOne(event.target.value)}>
-                  <option value="">Select an active driver</option>
-                  {activeRentals.map((rental) => (
-                    <option
-                      key={rental.id}
-                      value={rental.driver.id}
-                      disabled={rental.driver.id === driverTwoId}
-                    >
-                      {rental.driver.name} · {rental.vehicle.registration}
-                    </option>
-                  ))}
-                </select>
-                <span className="form-hint">Driver who will receive the other vehicle</span>
-              </label>
-              <label>
-                Driver two *
-                <select required value={driverTwoId} onChange={(event) => setDriverTwo(event.target.value)}>
-                  <option value="">Select another active driver</option>
-                  {activeRentals.map((rental) => (
-                    <option
-                      key={rental.id}
-                      value={rental.driver.id}
-                      disabled={rental.driver.id === driverOneId}
-                    >
-                      {rental.driver.name} · {rental.vehicle.registration}
-                    </option>
-                  ))}
-                </select>
-                <span className="form-hint">Driver who will receive the first driver's vehicle</span>
-              </label>
-            </div>
+            <fieldset className="form-section">
+              <legend className="form-section__title">Select Drivers</legend>
+              <div className="swap-grid">
+                <label>
+                  Driver one *
+                  <select required value={driverOneId} onChange={(event) => setDriverOne(event.target.value)}>
+                    <option value="">Select an active driver</option>
+                    {activeRentals.map((rental) => (
+                      <option
+                        key={rental.id}
+                        value={rental.driver.id}
+                        disabled={rental.driver.id === driverTwoId}
+                      >
+                        {rental.driver.name} · {rental.vehicle.registration}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="form-hint">Driver who will receive the other vehicle</span>
+                </label>
+                <label>
+                  Driver two *
+                  <select required value={driverTwoId} onChange={(event) => setDriverTwo(event.target.value)}>
+                    <option value="">Select another active driver</option>
+                    {activeRentals.map((rental) => (
+                      <option
+                        key={rental.id}
+                        value={rental.driver.id}
+                        disabled={rental.driver.id === driverOneId}
+                      >
+                        {rental.driver.name} · {rental.vehicle.registration}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="form-hint">Driver who will receive the first driver's vehicle</span>
+                </label>
+              </div>
+            </fieldset>
 
-            <div className="swap-preview-grid" aria-live="polite">
-              {[driverOneRental, driverTwoRental].map((rental, index) => {
-                const other = index === 0 ? driverTwoRental : driverOneRental;
-                return (
-                  <article className="swap-preview-card" key={index}>
-                    <h3>{index === 0 ? "Driver one" : "Driver two"}</h3>
-                    {rental ? (
-                      <>
-                        <strong>{rental.driver.name}</strong>
-                        <span>Currently in: {vehicleLabel(rental)}</span>
-                        <span>Weekly rent now: {formatAUD(rental.weeklyRent)}</span>
-                        <span>
-                          Will receive: {other ? vehicleLabel(other) : "Select the other driver"}
-                        </span>
-                      </>
-                    ) : (
-                      <p>Select an active driver to preview the exchange.</p>
-                    )}
-                  </article>
-                );
-              })}
-            </div>
+            <fieldset className="form-section">
+              <legend className="form-section__title">Swap Preview</legend>
+              <div className="swap-preview-grid" aria-live="polite">
+                {[driverOneRental, driverTwoRental].map((rental, index) => {
+                  const other = index === 0 ? driverTwoRental : driverOneRental;
+                  return (
+                    <article className="swap-preview-card" key={index}>
+                      <h3>{index === 0 ? "Driver one" : "Driver two"}</h3>
+                      {rental ? (
+                        <>
+                          <strong>{rental.driver.name}</strong>
+                          <span>Currently in: {vehicleLabel(rental)}</span>
+                          <span>Weekly rent now: {formatAUD(rental.weeklyRent)}</span>
+                          <span>
+                            Will receive: {other ? vehicleLabel(other) : "Select the other driver"}
+                          </span>
+                        </>
+                      ) : (
+                        <p>Select an active driver to preview the exchange.</p>
+                      )}
+                    </article>
+                  );
+                })}
+              </div>
+            </fieldset>
 
-            <div className="swap-grid swap-form__terms">
-              <label>
-                Swap date *
-                <input
-                  type="date"
-                  required
-                  min={minimumSwapDate}
-                  value={swapDate}
-                  onChange={(event) => setSwapDate(event.target.value)}
-                />
-                <span className="form-hint">Must be today or after both rental start dates</span>
-              </label>
-              <label>
-                Driver one new weekly rent (AUD) *
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  required
-                  value={newRentOne}
-                  onChange={(event) => setNewRentOne(event.target.value)}
-                />
-                <span className="form-hint">New rent for driver one in the swapped vehicle</span>
-              </label>
-              <label>
-                Driver two new weekly rent (AUD) *
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  required
-                  value={newRentTwo}
-                  onChange={(event) => setNewRentTwo(event.target.value)}
-                />
-                <span className="form-hint">New rent for driver two in the swapped vehicle</span>
-              </label>
-              <label className="swap-form__notes">
-                Notes
-                <textarea
-                  rows={3}
-                  value={notes}
-                  onChange={(event) => setNotes(event.target.value)}
-                  placeholder="Optional notes for the swap agreement"
-                />
-                <span className="form-hint">Reason for swap, special conditions, etc.</span>
-              </label>
-            </div>
+            <fieldset className="form-section">
+              <legend className="form-section__title">Swap Terms</legend>
+              <div className="swap-grid swap-form__terms">
+                <label>
+                  Swap date *
+                  <input
+                    type="date"
+                    required
+                    min={minimumSwapDate}
+                    value={swapDate}
+                    onChange={(event) => setSwapDate(event.target.value)}
+                  />
+                  <span className="form-hint">Must be today or after both rental start dates</span>
+                </label>
+                <label>
+                  Driver one new weekly rent (AUD) *
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    required
+                    value={newRentOne}
+                    onChange={(event) => setNewRentOne(event.target.value)}
+                  />
+                  <span className="form-hint">New rent for driver one in the swapped vehicle</span>
+                </label>
+                <label>
+                  Driver two new weekly rent (AUD) *
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    required
+                    value={newRentTwo}
+                    onChange={(event) => setNewRentTwo(event.target.value)}
+                  />
+                  <span className="form-hint">New rent for driver two in the swapped vehicle</span>
+                </label>
+                <label className="swap-form__notes">
+                  Notes
+                  <textarea
+                    rows={3}
+                    value={notes}
+                    onChange={(event) => setNotes(event.target.value)}
+                    placeholder="Optional notes for the swap agreement"
+                  />
+                  <span className="form-hint">Reason for swap, special conditions, etc.</span>
+                </label>
+              </div>
+            </fieldset>
 
             <div className="register-form__actions">
               <button
@@ -328,7 +337,7 @@ export default function SwapsPage() {
                 type="submit"
                 disabled={submitting || activeRentals.length < 2}
               >
-                Review and confirm swap
+                {submitting ? "Processing swap…" : "Confirm vehicle swap"}
               </button>
             </div>
           </form>
@@ -366,7 +375,7 @@ export default function SwapsPage() {
                         </td>
                         <td data-label="Agreement">
                           <Link className="button button--secondary" href={`/swaps/${swap.id}`}>
-                            Open Agreement
+                            View agreement
                           </Link>
                         </td>
                       </tr>

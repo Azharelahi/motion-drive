@@ -236,88 +236,105 @@ export default function DriversPage() {
 
       <form className="register-form" onSubmit={saveDriver}>
         <h2>{editingId ? "Edit driver" : "Add driver"}</h2>
-        <div className="vehicle-grid">
-          <label>
-            Name *
-            <input required value={form.name} onChange={(event) => updateField("name", event.target.value)} />
-            <span className="form-hint">Full legal name as on licence</span>
-          </label>
-          <label>
-            Mobile *
-            <input required value={form.mobile} onChange={(event) => updateField("mobile", event.target.value)} />
-            <span className="form-hint">Australian mobile (e.g. 0412 345 678)</span>
-          </label>
-          <label>
-            Email
-            <input type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} />
-            <span className="form-hint">For contract copies and notifications</span>
-          </label>
-          <label>
-            Date of birth
-            <input type="date" value={form.dateOfBirth} onChange={(event) => updateField("dateOfBirth", event.target.value)} />
-            <span className="form-hint">For age verification (must be 21+ for rideshare)</span>
-          </label>
-          <label>
-            Licence number
-            <input value={form.licenceNumber} onChange={(event) => updateField("licenceNumber", event.target.value)} />
-            <span className="form-hint">Victorian driver licence number</span>
-          </label>
-          <label>
-            Licence state
-            <input value={form.licenceState} onChange={(event) => updateField("licenceState", event.target.value)} />
-            <span className="form-hint">State of issue (e.g. VIC, NSW)</span>
-          </label>
-          <label>
-            Licence expiry
-            <input type="date" value={form.licenceExpiry} onChange={(event) => updateField("licenceExpiry", event.target.value)} />
-            <span className="form-hint">Expiry date on driver licence (triggers 90-day warning)</span>
-          </label>
-          <label>
-            Rideshare accreditation
-            <input value={form.rideshareAccreditation} onChange={(event) => updateField("rideshareAccreditation", event.target.value)} />
-            <span className="form-hint">VicRoads rideshare accreditation number</span>
-          </label>
-          <label>
-            Rideshare expiry
-            <input type="date" value={form.rideshareAccreditationExpiry} onChange={(event) => updateField("rideshareAccreditationExpiry", event.target.value)} />
-            <span className="form-hint">Rideshare accreditation expiry date</span>
-          </label>
-          <label>
-            ABN
-            <input value={form.abn} onChange={(event) => updateField("abn", event.target.value)} />
-            <span className="form-hint">Australian Business Number (if driver is contractor)</span>
-          </label>
-          <label>
-            Emergency contact
-            <input value={form.emergencyContact} onChange={(event) => updateField("emergencyContact", event.target.value)} />
-            <span className="form-hint">Name and phone (e.g. Jane Doe - 0412 345 678)</span>
-          </label>
-          <label>
-            Status
-            <select value={form.status} onChange={(event) => updateField("status", event.target.value)}>
-              <option>Ended</option>
-              <option>Current</option>
-            </select>
-            <span className="form-hint">Current = active driver; Ended = no active rental</span>
-          </label>
-          <label className="register-form__notes">
-            Address
-            <textarea value={form.address} onChange={(event) => updateField("address", event.target.value)} />
-            <span className="form-hint">Residential address for contract</span>
-          </label>
-          <label className="register-form__notes">
-            Notes
-            <textarea value={form.notes} onChange={(event) => updateField("notes", event.target.value)} />
-            <span className="form-hint">Internal notes, medical conditions, special conditions</span>
-          </label>
-        </div>
+
+        <fieldset className="form-section">
+          <legend className="form-section__title">Personal Details</legend>
+          <div className="form-section__grid">
+            <label>
+              Name *
+              <input required value={form.name} onChange={(event) => updateField("name", event.target.value)} />
+              <span className="form-hint">Full legal name as on licence</span>
+            </label>
+            <label>
+              Mobile *
+              <input required value={form.mobile} onChange={(event) => updateField("mobile", event.target.value)} />
+              <span className="form-hint">Australian mobile (e.g. 0412 345 678)</span>
+            </label>
+            <label>
+              Email
+              <input type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} />
+              <span className="form-hint">For contract copies and notifications</span>
+            </label>
+            <label>
+              Date of birth
+              <input type="date" value={form.dateOfBirth} onChange={(event) => updateField("dateOfBirth", event.target.value)} />
+              <span className="form-hint">For age verification (must be 21+ for rideshare)</span>
+            </label>
+            <label className="register-form__notes">
+              Address
+              <textarea value={form.address} onChange={(event) => updateField("address", event.target.value)} />
+              <span className="form-hint">Residential address for contract</span>
+            </label>
+            <label className="register-form__notes">
+              Notes
+              <textarea value={form.notes} onChange={(event) => updateField("notes", event.target.value)} />
+              <span className="form-hint">Internal notes, medical conditions, special conditions</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset className="form-section">
+          <legend className="form-section__title">Licence & Accreditation</legend>
+          <div className="form-section__grid">
+            <label>
+              Licence number
+              <input value={form.licenceNumber} onChange={(event) => updateField("licenceNumber", event.target.value)} />
+              <span className="form-hint">Victorian driver licence number</span>
+            </label>
+            <label>
+              Licence state
+              <input value={form.licenceState} onChange={(event) => updateField("licenceState", event.target.value)} />
+              <span className="form-hint">State of issue (e.g. VIC, NSW)</span>
+            </label>
+            <label>
+              Licence expiry
+              <input type="date" value={form.licenceExpiry} onChange={(event) => updateField("licenceExpiry", event.target.value)} />
+              <span className="form-hint">Expiry date on driver licence (triggers 90-day warning)</span>
+            </label>
+            <label>
+              Rideshare accreditation
+              <input value={form.rideshareAccreditation} onChange={(event) => updateField("rideshareAccreditation", event.target.value)} />
+              <span className="form-hint">VicRoads rideshare accreditation number</span>
+            </label>
+            <label>
+              Rideshare expiry
+              <input type="date" value={form.rideshareAccreditationExpiry} onChange={(event) => updateField("rideshareAccreditationExpiry", event.target.value)} />
+              <span className="form-hint">Rideshare accreditation expiry date</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset className="form-section">
+          <legend className="form-section__title">Business & Emergency</legend>
+          <div className="form-section__grid">
+            <label>
+              ABN
+              <input value={form.abn} onChange={(event) => updateField("abn", event.target.value)} />
+              <span className="form-hint">Australian Business Number (if driver is contractor)</span>
+            </label>
+            <label>
+              Emergency contact
+              <input value={form.emergencyContact} onChange={(event) => updateField("emergencyContact", event.target.value)} />
+              <span className="form-hint">Name and phone (e.g. Jane Doe - 0412 345 678)</span>
+            </label>
+            <label>
+              Status
+              <select value={form.status} onChange={(event) => updateField("status", event.target.value)}>
+                <option>Ended</option>
+                <option>Current</option>
+              </select>
+              <span className="form-hint">Current = active driver; Ended = no active rental</span>
+            </label>
+          </div>
+        </fieldset>
+
         <div className="register-form__actions">
           <button className="button button--primary" type="submit" disabled={submitting}>
-            {submitting ? "Saving…" : editingId ? "Save driver" : "Add driver"}
+            {submitting ? "Saving…" : editingId ? "Save changes" : "Add driver to register"}
           </button>
           {editingId ? (
             <button className="button button--secondary" type="button" onClick={cancelEdit} disabled={submitting}>
-              Cancel Edit
+              Cancel editing
             </button>
           ) : null}
         </div>
@@ -372,9 +389,9 @@ export default function DriversPage() {
                       <td>{driver._count.documents}</td>
                       <td>
                         <div className="table-actions">
-                          <Link className="button button--secondary" href={`/drivers/${driver.id}`}>Profile</Link>
-                          <button className="button button--secondary" type="button" onClick={() => beginEdit(driver)}>Edit</button>
-                          <button className="button button--danger" type="button" onClick={() => requestDelete(driver)}>Delete</button>
+                          <Link className="button button--secondary" href={`/drivers/${driver.id}`}>View profile</Link>
+                          <button className="button button--secondary" type="button" onClick={() => beginEdit(driver)}>Edit details</button>
+                          <button className="button button--danger" type="button" onClick={() => requestDelete(driver)}>Delete driver</button>
                         </div>
                       </td>
                     </tr>
