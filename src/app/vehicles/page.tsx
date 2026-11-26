@@ -252,25 +252,105 @@ export default function VehiclesPage() {
       <form className="register-form" onSubmit={saveVehicle}>
         <h2>{editingId ? "Edit vehicle" : "Add vehicle"}</h2>
         <div className="vehicle-grid">
-          <label>Registration *<input required value={form.registration} onChange={(event) => updateField("registration", event.target.value)} /></label>
-          <label>Model *<input required value={form.model} onChange={(event) => updateField("model", event.target.value)} /></label>
-          <label>Make<input value={form.make} onChange={(event) => updateField("make", event.target.value)} /></label>
-          <label>Fuel type<input value={form.fuelType} onChange={(event) => updateField("fuelType", event.target.value)} /></label>
-          <label>Year<input type="number" min="1886" max="9999" value={form.year} onChange={(event) => updateField("year", event.target.value)} /></label>
-          <label>Colour<input value={form.colour} onChange={(event) => updateField("colour", event.target.value)} /></label>
-          <label>VIN<input value={form.vin} onChange={(event) => updateField("vin", event.target.value)} /></label>
-          <label>Status<select value={form.status} onChange={(event) => updateField("status", event.target.value)}><option>Available</option><option>Rented</option><option>Inactive</option></select></label>
-          <label>Weekly rent<input type="number" min="0" step="0.01" required value={form.weeklyRent} onChange={(event) => updateField("weeklyRent", event.target.value)} /></label>
-          <label>Bond<input type="number" min="0" step="0.01" value={form.bond} onChange={(event) => updateField("bond", event.target.value)} /></label>
-          <label>Excess<input type="number" min="0" step="0.01" value={form.excess} onChange={(event) => updateField("excess", event.target.value)} /></label>
-          <label>KM allowance<input value={form.kmAllowance} onChange={(event) => updateField("kmAllowance", event.target.value)} /></label>
-          <label>Pickup location<input value={form.pickupLocation} onChange={(event) => updateField("pickupLocation", event.target.value)} /></label>
-          <label>Odometer<input type="number" min="0" value={form.odometer} onChange={(event) => updateField("odometer", event.target.value)} /></label>
-          <label>Next service KM<input type="number" min="0" value={form.nextServiceKm} onChange={(event) => updateField("nextServiceKm", event.target.value)} /></label>
-          <label>Registration expiry<input type="date" value={form.registrationExpiry} onChange={(event) => updateField("registrationExpiry", event.target.value)} /></label>
-          <label>Insurance expiry<input type="date" value={form.insuranceExpiry} onChange={(event) => updateField("insuranceExpiry", event.target.value)} /></label>
-          <label>Inspection expiry<input type="date" value={form.inspectionExpiry} onChange={(event) => updateField("inspectionExpiry", event.target.value)} /></label>
-          <label className="register-form__notes">Notes<textarea value={form.notes} onChange={(event) => updateField("notes", event.target.value)} /></label>
+          <label>
+            Registration *
+            <input required value={form.registration} onChange={(event) => updateField("registration", event.target.value)} />
+            <span className="form-hint">VicRoads plate number (e.g. ABC123)</span>
+          </label>
+          <label>
+            Model *
+            <input required value={form.model} onChange={(event) => updateField("model", event.target.value)} />
+            <span className="form-hint">Vehicle model name (e.g. Corolla, Camry, Hilux)</span>
+          </label>
+          <label>
+            Make
+            <input value={form.make} onChange={(event) => updateField("make", event.target.value)} />
+            <span className="form-hint">Manufacturer brand (e.g. Toyota, Ford, Mazda)</span>
+          </label>
+          <label>
+            Fuel type
+            <input value={form.fuelType} onChange={(event) => updateField("fuelType", event.target.value)} />
+            <span className="form-hint">Petrol, Diesel, Hybrid, Electric, LPG</span>
+          </label>
+          <label>
+            Year
+            <input type="number" min="1886" max="9999" value={form.year} onChange={(event) => updateField("year", event.target.value)} />
+            <span className="form-hint">Manufacture year (e.g. 2022)</span>
+          </label>
+          <label>
+            Colour
+            <input value={form.colour} onChange={(event) => updateField("colour", event.target.value)} />
+            <span className="form-hint">Exterior colour (e.g. White, Silver, Blue)</span>
+          </label>
+          <label>
+            VIN
+            <input value={form.vin} onChange={(event) => updateField("vin", event.target.value)} />
+            <span className="form-hint">17-character Vehicle Identification Number</span>
+          </label>
+          <label>
+            Status
+            <select value={form.status} onChange={(event) => updateField("status", event.target.value)}>
+              <option>Available</option>
+              <option>Rented</option>
+              <option>Inactive</option>
+            </select>
+            <span className="form-hint">Available = ready to rent; Rented = currently on contract; Inactive = not in service</span>
+          </label>
+          <label>
+            Weekly rent *
+            <input type="number" min="0" step="0.01" required value={form.weeklyRent} onChange={(event) => updateField("weeklyRent", event.target.value)} />
+            <span className="form-hint">Rent amount per week in AUD (e.g. 350.00)</span>
+          </label>
+          <label>
+            Bond
+            <input type="number" min="0" step="0.01" value={form.bond} onChange={(event) => updateField("bond", event.target.value)} />
+            <span className="form-hint">Security deposit amount (default $500)</span>
+          </label>
+          <label>
+            Excess
+            <input type="number" min="0" step="0.01" value={form.excess} onChange={(event) => updateField("excess", event.target.value)} />
+            <span className="form-hint">Driver liability excess for damage (default $0)</span>
+          </label>
+          <label>
+            KM allowance
+            <input value={form.kmAllowance} onChange={(event) => updateField("kmAllowance", event.target.value)} />
+            <span className="form-hint">e.g. Unlimited, 1000km/week, 5000km/month</span>
+          </label>
+          <label>
+            Pickup location
+            <input value={form.pickupLocation} onChange={(event) => updateField("pickupLocation", event.target.value)} />
+            <span className="form-hint">Where driver collects the vehicle (default: Tarneit, VIC)</span>
+          </label>
+          <label>
+            Odometer
+            <input type="number" min="0" value={form.odometer} onChange={(event) => updateField("odometer", event.target.value)} />
+            <span className="form-hint">Current odometer reading in km</span>
+          </label>
+          <label>
+            Next service KM
+            <input type="number" min="0" value={form.nextServiceKm} onChange={(event) => updateField("nextServiceKm", event.target.value)} />
+            <span className="form-hint">Odometer reading when next service is due</span>
+          </label>
+          <label>
+            Registration expiry
+            <input type="date" value={form.registrationExpiry} onChange={(event) => updateField("registrationExpiry", event.target.value)} />
+            <span className="form-hint">VicRoads registration expiry date</span>
+          </label>
+          <label>
+            Insurance expiry
+            <input type="date" value={form.insuranceExpiry} onChange={(event) => updateField("insuranceExpiry", event.target.value)} />
+            <span className="form-hint">Comprehensive insurance policy expiry</span>
+          </label>
+          <label>
+            Inspection expiry
+            <input type="date" value={form.inspectionExpiry} onChange={(event) => updateField("inspectionExpiry", event.target.value)} />
+            <span className="form-hint">RWC / roadworthy certificate expiry (if applicable)</span>
+          </label>
+          <label className="register-form__notes">
+            Notes
+            <textarea value={form.notes} onChange={(event) => updateField("notes", event.target.value)} />
+            <span className="form-hint">Internal notes, damage records, special conditions</span>
+          </label>
         </div>
         <div className="register-form__actions">
           <button className="button button--primary" type="submit" disabled={submitting}>

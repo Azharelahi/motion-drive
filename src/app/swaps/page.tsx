@@ -231,6 +231,7 @@ export default function SwapsPage() {
                     </option>
                   ))}
                 </select>
+                <span className="form-hint">Driver who will receive the other vehicle</span>
               </label>
               <label>
                 Driver two *
@@ -246,6 +247,7 @@ export default function SwapsPage() {
                     </option>
                   ))}
                 </select>
+                <span className="form-hint">Driver who will receive the first driver's vehicle</span>
               </label>
             </div>
 
@@ -282,6 +284,7 @@ export default function SwapsPage() {
                   value={swapDate}
                   onChange={(event) => setSwapDate(event.target.value)}
                 />
+                <span className="form-hint">Must be today or after both rental start dates</span>
               </label>
               <label>
                 Driver one new weekly rent (AUD) *
@@ -293,6 +296,7 @@ export default function SwapsPage() {
                   value={newRentOne}
                   onChange={(event) => setNewRentOne(event.target.value)}
                 />
+                <span className="form-hint">New rent for driver one in the swapped vehicle</span>
               </label>
               <label>
                 Driver two new weekly rent (AUD) *
@@ -304,6 +308,7 @@ export default function SwapsPage() {
                   value={newRentTwo}
                   onChange={(event) => setNewRentTwo(event.target.value)}
                 />
+                <span className="form-hint">New rent for driver two in the swapped vehicle</span>
               </label>
               <label className="swap-form__notes">
                 Notes
@@ -313,6 +318,7 @@ export default function SwapsPage() {
                   onChange={(event) => setNotes(event.target.value)}
                   placeholder="Optional notes for the swap agreement"
                 />
+                <span className="form-hint">Reason for swap, special conditions, etc.</span>
               </label>
             </div>
 

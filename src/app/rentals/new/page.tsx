@@ -219,18 +219,20 @@ export default function NewRentalPage() {
                     const activeContract = vehicle.contracts[0];
                     return (
                       <option key={vehicle.id} value={vehicle.id} disabled={Boolean(activeContract)}>
-                        {vehicle.registration} · {vehicle.year ? `${vehicle.year} ` : ""}{vehicle.model}
+                        {vehicle.registration} · {vehicle.year ? `${vehicle.year} ` : ""}{vehicle.make ? `${vehicle.make} ` : ""}{vehicle.model}{vehicle.colour ? ` · ${vehicle.colour}` : ""}
                         {activeContract ? ` — Currently rented by ${activeContract.driver.name}` : ""}
                       </option>
                     );
                   })}
                 </select>
+                <span className="form-hint">Only vehicles with no active rental are selectable</span>
               </label>
               {selectedVehicle ? (
                 <div className="rental-summary">
                   <span>Weekly rent: {formatAUD(selectedVehicle.weeklyRent)}</span>
                   <span>Bond: {formatAUD(selectedVehicle.bond)}</span>
                   <span>Excess: {formatAUD(selectedVehicle.excess)}</span>
+                  <span>KM allowance: {selectedVehicle.kmAllowance}</span>
                 </div>
               ) : null}
               {availableVehicles.length === 0 ? (
@@ -285,19 +287,80 @@ export default function NewRentalPage() {
                 <strong>{selectedDriver?.name}</strong>
               </p>
               <div className="vehicle-grid">
-                <label>Agreement date *<input type="date" required value={form.agreementDate} onChange={(event) => updateForm("agreementDate", event.target.value)} /></label>
-                <label>Start date *<input type="date" required value={form.startDate} onChange={(event) => updateForm("startDate", event.target.value)} /></label>
-                <label>End date<input type="date" value={form.endDate} onChange={(event) => updateForm("endDate", event.target.value)} /></label>
-                <label>Weekly rent (AUD) *<input type="number" min="0" step="0.01" required value={form.weeklyRent} onChange={(event) => updateForm("weeklyRent", event.target.value)} /></label>
-                <label>Bond (AUD)<input type="number" min="0" step="0.01" value={form.bond} onChange={(event) => updateForm("bond", event.target.value)} /></label>
-                <label>Excess (AUD)<input type="number" min="0" step="0.01" value={form.excess} onChange={(event) => updateForm("excess", event.target.value)} /></label>
-                <label>KM allowance<input value={form.kmAllowance} onChange={(event) => updateForm("kmAllowance", event.target.value)} /></label>
-                <label>Ongoing term<input value={form.term} onChange={(event) => updateForm("term", event.target.value)} /></label>
-                <label>Notice period<input value={form.noticePeriod} onChange={(event) => updateForm("noticePeriod", event.target.value)} /></label>
-                <label>Payment frequency<input value={form.paymentFrequency} onChange={(event) => updateForm("paymentFrequency", event.target.value)} /></label>
-                <label>Payment method<select value={form.paymentMethod} onChange={(event) => updateForm("paymentMethod", event.target.value === "PayID" ? "PayID" : "Bank Transfer")}><option>Bank Transfer</option><option>PayID</option></select></label>
-                <label>Rideshare use<select value={form.rideshareUse ? "Yes" : "No"} onChange={(event) => updateForm("rideshareUse", event.target.value === "Yes")}><option>Yes</option><option>No</option></select></label>
-                <label>Private use<select value={form.privateUse ? "Yes" : "No"} onChange={(event) => updateForm("privateUse", event.target.value === "Yes")}><option>Yes</option><option>No</option></select></label>
+                <label>
+                  Agreement date *
+                  <input type="date" required value={form.agreementDate} onChange={(event) => updateForm("agreementDate", event.target.value)} />
+                  <span className="form-hint">Date the agreement is signed (defaults to today)</span>
+                </label>
+                <label>
+                  Start date *
+                  <input type="date" required value={form.startDate} onChange={(event) => updateForm("startDate", event.target.value)} />
+                  <span className="form-hint">Date driver takes possession of vehicle</span>
+                </label>
+                <label>
+                  End date
+                  <input type="date" value={form.endDate} onChange={(event) => updateForm("endDate", event.target.value)} />
+                  <span className="form-hint">Optional fixed end date (leave blank for ongoing month-to-month)</span>
+                </label>
+                <label>
+                  Weekly rent (AUD) *
+                  <input type="number" min="0" step="0.01" required value={form.weeklyRent} onChange={(event) => updateForm("weeklyRent", event.target.value)} />
+                  <span className="form-hint">Pre-filled from vehicle; adjust if negotiated</span>
+                </label>
+                <label>
+                  Bond (AUD)
+                  <input type="number" min="0" step="0.01" value={form.bond} onChange={(event) => updateForm("bond", event.target.value)} />
+                  <span className="form-hint">Security deposit (pre-filled from vehicle, default $500)</span>
+                </label>
+                <label>
+                  Excess (AUD)
+                  <input type="number" min="0" step="0.01" value={form.excess} onChange={(event) => updateForm("excess", event.target.value)} />
+                  <span className="form-hint">Driver liability for damage (pre-filled from vehicle, default $0)</span>
+                </label>
+                <label>
+                  KM allowance
+                  <input value={form.kmAllowance} onChange={(event) => updateForm("kmAllowance", event.target.value)} />
+                  <span className="form-hint">e.g. Unlimited, 1000km/week (pre-filled from vehicle)</span>
+                </label>
+                <label>
+                  Ongoing term
+                  <input value={form.term} onChange={(event) => updateForm("term", event.target.value)} />
+                  <span className="form-hint">e.g. Month to month, 6 months, 12 months</span>
+                </label>
+                <label>
+                  Notice period
+                  <input value={form.noticePeriod} onChange={(event) => updateForm("noticePeriod", event.target.value)} />
+                  <span className="form-hint">Notice required to end agreement (e.g. 7 days, 14 days)</span>
+                </label>
+                <label>
+                  Payment frequency
+                  <input value={form.paymentFrequency} onChange={(event) => updateForm("paymentFrequency", event.target.value)} />
+                  <span className="form-hint">e.g. Weekly in advance, Fortnightly in advance</span>
+                </label>
+                <label>
+                  Payment method
+                  <select value={form.paymentMethod} onChange={(event) => updateForm("paymentMethod", event.target.value === "PayID" ? "PayID" : "Bank Transfer")}>
+                    <option>Bank Transfer</option>
+                    <option>PayID</option>
+                  </select>
+                  <span className="form-hint">How rent payments are made</span>
+                </label>
+                <label>
+                  Rideshare use
+                  <select value={form.rideshareUse ? "Yes" : "No"} onChange={(event) => updateForm("rideshareUse", event.target.value === "Yes")}>
+                    <option>Yes</option>
+                    <option>No</option>
+                  </select>
+                  <span className="form-hint">Driver may use vehicle for Uber/Ola/Didi etc.</span>
+                </label>
+                <label>
+                  Private use
+                  <select value={form.privateUse ? "Yes" : "No"} onChange={(event) => updateForm("privateUse", event.target.value === "Yes")}>
+                    <option>Yes</option>
+                    <option>No</option>
+                  </select>
+                  <span className="form-hint">Driver may use vehicle for personal trips</span>
+                </label>
               </div>
               <div className="register-form__actions">
                 <button className="button button--secondary" type="button" onClick={() => setStep(2)} disabled={submitting}>Back</button>
